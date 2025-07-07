@@ -1,5 +1,6 @@
-import { createButton, createInput, createTitle } from './UI-elements.ts'
-import { validateTypedText } from '../utils/helpers.ts'
+import { createButton, createInput, createTitle, renderTableRow } from './UI-elements.ts'
+import { sortListByValue, validateTypedText } from '../utils/helpers.ts'
+import type { Goods } from '../models/models.ts'
 
 export const renderHeader = () => {
   const wrapper = document.createElement('div')
@@ -32,25 +33,46 @@ export const renderForm = () => {
   return form
 }
 
-export const renderTable = () => {
-  const headers = ['Название', 'Полка', 'Вес', 'Время хранения', '']
+export const renderTable = (list: Goods[]) => {
   const table = document.createElement('table')
   const thead = document.createElement('thead')
   const headerRow = document.createElement('tr')
   const tbody = document.createElement('tbody')
 
+  tbody.replaceChildren()
   table.className = 'table'
 
-  headers.map((text) => {
+  const headers: Omit<Goods, 'id'> = {
+    goodsName: 'Название',
+    goodsRack: 'Полка',
+    goodsWeight: 'Вес',
+    storageTime: 'Время хранения'
+  }
+
+  Object.entries(headers).forEach(([key, value]) => {
     const th = document.createElement('th')
     th.className = 'table__head'
-    th.textContent = text
+    th.textContent = value
+    th.id = key
+    th.dataset.order = 'ascending'
+
+    th.addEventListener('click', () => {
+      th.dataset.order = th.dataset.order === 'ascending' ? 'descending' : 'ascending'
+      sortListByValue(list, key, th.dataset.order)
+      console.log(key)
+    })
 
     headerRow.appendChild(th)
   })
 
+  const emptyTd = document.createElement('th')
+  emptyTd.className = 'table__head'
+  headerRow.appendChild(emptyTd)
+
   thead.appendChild(headerRow)
   table.append(thead, tbody)
+
+  renderTableRow(tbody, list)
 
   return table
 }

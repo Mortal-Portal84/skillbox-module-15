@@ -1,3 +1,5 @@
+import type { Goods } from '../models/models.ts'
+
 export const createTitle = (titleSize: 'h1' | 'h2', titleText: string) => {
   const title = document.createElement(titleSize)
   title.textContent = titleText
@@ -51,13 +53,15 @@ export const createButton = (
 
 export const renderTableRow = (
   tableBody: HTMLTableSectionElement,
-  goodsArray: Record<string, string | number>[]
+  goodsArray: Goods[]
 ) => {
   tableBody.replaceChildren()
 
   goodsArray.map((goods) => {
     const row = document.createElement('tr')
-    const rowData = Object.values(goods)
+
+    const { goodsName, goodsRack, goodsWeight, storageTime } = goods
+    const rowData = [goodsName, goodsRack, goodsWeight, storageTime]
 
     rowData.map((cellData) => {
       const td = document.createElement('td')
@@ -66,9 +70,14 @@ export const renderTableRow = (
     })
 
     const actionTd = document.createElement('td')
-    actionTd.appendChild(createButton('button', 'delete', 'Удалить'))
+    const deleteBtn = createButton('button', 'delete', 'Удалить')
+
+    deleteBtn.dataset.goodsId = goods.id
+
+    actionTd.appendChild(deleteBtn)
     row.appendChild(actionTd)
 
     tableBody.appendChild(row)
   })
 }
+
