@@ -1,4 +1,4 @@
-import { createButton, createInput, createTitle } from './UI-elements.ts'
+import { createButton, createInput, createTitle } from './ui-elements.ts'
 import { validateTypedText } from '../utils/helpers.ts'
 import type { Goods } from '../models/models.ts'
 
