@@ -5,5 +5,3 @@ export type Goods = {
   goodsWeight: string,
   storageTime: string
 }
-
-export type Order = 'ascending' | 'descending'

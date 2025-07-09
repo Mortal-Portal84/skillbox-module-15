@@ -1,10 +1,9 @@
-import { renderForm, renderHeader } from './components/components.ts'
-
+import { renderForm, renderHeader, renderTable, renderTableRow } from './components/components.ts'
 import type { Goods } from './models/models.ts'
-import { initController } from './utils/uiController.ts'
-
 import './style.css'
+import { sortCompare } from './utils/helpers.ts'
 
+// 📦 Исходный список товаров
 let goodsList: Goods[] = [
   {
     id: '1',
@@ -36,51 +35,78 @@ let goodsList: Goods[] = [
   }
 ]
 
-const app = document.getElementById('app')
+let filteredList: Goods[] = [...goodsList]
+
+let sortState: { key: keyof Goods | null; order: 'ascending' | 'descending' } = {
+  key: null,
+  order: 'ascending'
+}
+
+const app = document.getElementById('app')!
 const header = renderHeader()
 const form = renderForm()
+const table = renderTable()
+const tbody = table.querySelector('tbody')!
+
+app.append(header, table)
+
+const rerenderRows = () => {
+  const listToRender = [...filteredList]
+  if (sortState.key) {
+    listToRender.sort((a, b) => sortCompare(a, b, sortState.key!, sortState.order))
+  }
+  renderTableRow(tbody, listToRender, handleDelete)
+}
+
+const handleDelete = (id: string) => {
+  goodsList = goodsList.filter(item => item.id !== id)
+  filteredList = filteredList.filter(item => item.id !== id)
+  rerenderRows()
+}
+
+const searchInput = header.querySelector('#search') as HTMLInputElement
+searchInput.addEventListener('input', () => {
+  const value = searchInput.value.toLowerCase()
+  filteredList = goodsList.filter(item =>
+    item.goodsName.toLowerCase().includes(value)
+  )
+  rerenderRows()
+})
 
 const addButton = header.querySelector('.add')
 addButton?.addEventListener('click', () => {
-  app?.replaceChildren(form)
+  app.replaceChildren(form)
 })
 
 const submitButton = form.querySelector('.add')
 submitButton?.addEventListener('click', (e) => {
   e.preventDefault()
-
-  if (!form.checkValidity()) {
-    form.reportValidity()
-    return
-  }
-
-  const nameInput = document.getElementById('goods-name') as HTMLInputElement
-  const rackInput = document.getElementById('rack') as HTMLInputElement
-  const weightInput = document.getElementById('weight') as HTMLInputElement
-  const storageDateInput = document.getElementById('storage-time') as HTMLInputElement
+  if (!form.checkValidity()) return form.reportValidity()
 
   const goods: Goods = {
     id: crypto.randomUUID(),
-    goodsName: nameInput.value,
-    goodsRack: rackInput.value,
-    goodsWeight: weightInput.value,
-    storageTime: storageDateInput.value
+    goodsName: (document.getElementById('goods-name') as HTMLInputElement).value,
+    goodsRack: (document.getElementById('rack') as HTMLInputElement).value,
+    goodsWeight: (document.getElementById('weight') as HTMLInputElement).value,
+    storageTime: (document.getElementById('storage-time') as HTMLInputElement).value
   }
 
-  goodsList = [goods, ...goodsList]
+  goodsList.unshift(goods)
+  filteredList = [...goodsList]
   form.reset()
-
-  initController(
-    () => goodsList,
-    (newList) => { goodsList = newList },
-    app!,
-    header
-  )
+  app.replaceChildren(header, table)
+  rerenderRows()
 })
 
-initController(
-  () => goodsList,
-  (newList) => { goodsList = newList },
-  app!,
-  header
-)
+const thElements = table.querySelectorAll('th.sortable')
+thElements.forEach((th) => {
+  th.addEventListener('click', () => {
+    const key = th.id as keyof Goods
+    const isSameKey = sortState.key === key
+    const newOrder = isSameKey && sortState.order === 'ascending' ? 'descending' : 'ascending'
+    sortState = { key, order: newOrder }
+    rerenderRows()
+  })
+})
+
+rerenderRows()

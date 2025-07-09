@@ -1,5 +1,5 @@
 import { createButton, createInput, createTitle } from './UI-elements.ts'
-import { sortListByValue, validateTypedText } from '../utils/helpers.ts'
+import { validateTypedText } from '../utils/helpers.ts'
 import type { Goods } from '../models/models.ts'
 
 export const renderHeader = () => {
@@ -68,18 +68,12 @@ export const renderTableRow = (
   })
 }
 
-export const renderTable = (
-  getList: () => Goods[],
-  setList: (newList: Goods[]) => void,
-  getSortState: () => { key: keyof Goods | null; order: 'ascending' | 'descending' },
-  setSortState: (newState: { key: keyof Goods | null; order: 'ascending' | 'descending' }) => void
-) => {
+export const renderTable = (): HTMLTableElement => {
   const table = document.createElement('table')
+  table.className = 'table'
+
   const thead = document.createElement('thead')
   const headerRow = document.createElement('tr')
-  const tbody = document.createElement('tbody')
-
-  table.className = 'table'
 
   const headers: Omit<Goods, 'id'> = {
     goodsName: 'Название',
@@ -88,42 +82,21 @@ export const renderTable = (
     storageTime: 'Время хранения'
   }
 
-  const handleSort = (key: keyof Goods) => {
-    const currentSort = getSortState()
-
-    const newOrder =
-      currentSort.key === key && currentSort.order === 'ascending'
-        ? 'descending'
-        : 'ascending'
-
-    setSortState({ key, order: newOrder })
-    sortListByValue(getList(), key, newOrder, setList)
-  }
-
-  Object.entries(headers).forEach(([key, value]) => {
+  Object.entries(headers).forEach(([key, label]) => {
     const th = document.createElement('th')
-    th.className = 'table__head'
-    th.textContent = value
     th.id = key
-
-    th.addEventListener('click', () => {
-      handleSort(key as keyof Goods)
-    })
-
+    th.textContent = label
+    th.className = 'table__head sortable'
     headerRow.appendChild(th)
   })
 
-  const emptyTd = document.createElement('th')
-  emptyTd.className = 'table__head'
-  headerRow.appendChild(emptyTd)
-  thead.appendChild(headerRow)
-  table.append(thead, tbody)
+  const emptyTh = document.createElement('th')
+  emptyTh.className = 'table__head'
+  headerRow.appendChild(emptyTh)
 
-  renderTableRow(tbody, getList(), (id) => {
-    const updated = getList().filter(item => item.id !== id)
-    setList(updated)
-  })
+  thead.appendChild(headerRow)
+  const tbody = document.createElement('tbody')
+  table.append(thead, tbody)
 
   return table
 }
-
