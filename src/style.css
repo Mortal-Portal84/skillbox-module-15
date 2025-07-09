@@ -59,12 +59,12 @@ form {
   width: 500px;
 }
 
-form input, button {
+.form__input, button {
   border-radius: 20px;
   border: none;
 }
 
-form input {
+.form__input {
   padding: 0.8em 1.2em;
 }
 
