@@ -60,12 +60,20 @@ const rerender = () => {
 app.append(header, table)
 rerender()
 
+if (!tbody.hasChildNodes()) {
+  const emptyTableRow = document.createElement('tr')
+  const tableCap = document.createElement('td')
+  tableCap.textContent = 'Склад пуст'
+
+  emptyTableRow.appendChild(tableCap)
+  tbody.appendChild(emptyTableRow)
+}
+
 thElements.forEach((th) => {
   th.addEventListener('click', () => {
     const key = th.id as keyof Goods
     const isSameKey = sortState.key === key
-    const newOrder =
-      isSameKey && sortState.order === 'ascending' ? 'descending' : 'ascending'
+    const newOrder = isSameKey && sortState.order === 'ascending' ? 'descending' : 'ascending'
 
     sortState = { key, order: newOrder }
 
@@ -76,9 +84,8 @@ thElements.forEach((th) => {
 const searchInput = header.querySelector('#search') as HTMLInputElement
 searchInput.addEventListener('input', () => {
   const value = searchInput.value.toLowerCase()
-  filteredList = goodsList.filter((item) =>
-    item.goodsName.toLowerCase().includes(value)
-  )
+  filteredList = goodsList.filter((item) => item.goodsName.toLowerCase().includes(value))
+
   rerender()
 })
 

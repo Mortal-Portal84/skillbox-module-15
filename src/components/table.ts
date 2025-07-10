@@ -1,6 +1,18 @@
 import { createButton } from './ui-elements.ts'
 import type { Goods } from '../models/models.ts'
 
+export const renderEmptyState = (tbody: HTMLTableSectionElement, colCount: number) => {
+  const emptyRow = document.createElement('tr')
+  const emptyCell = document.createElement('td')
+  emptyCell.className = 'table__empty-cell'
+
+  emptyCell.textContent = 'Склад пуст'
+  emptyCell.colSpan = colCount
+
+  emptyRow.appendChild(emptyCell)
+  tbody.appendChild(emptyRow)
+}
+
 export const renderTableRow = (
   tableBody: HTMLTableSectionElement,
   goodsArray: Goods[],
@@ -9,13 +21,18 @@ export const renderTableRow = (
 ) => {
   tableBody.replaceChildren()
 
-  goodsArray.map((goods) => {
-    const row = document.createElement('tr')
+  if (goodsArray.length === 0) {
+    const colCount = tableBody.closest('table')?.querySelectorAll('thead th').length || 1
+    renderEmptyState(tableBody, colCount)
+    return
+  }
 
+  goodsArray.forEach((goods) => {
+    const row = document.createElement('tr')
     const { goodsName, goodsRack, goodsWeight, storageTime } = goods
     const rowData = [goodsName, goodsRack, goodsWeight, storageTime]
 
-    rowData.map((cellData) => {
+    rowData.forEach((cellData) => {
       const td = document.createElement('td')
       td.textContent = String(cellData)
       row.appendChild(td)
@@ -27,13 +44,8 @@ export const renderTableRow = (
     const editBtn = createButton('button', 'edit', 'Изменить')
     const deleteBtn = createButton('button', 'delete', 'Удалить')
 
-    editBtn.addEventListener('click', () => {
-      onEdit(goods)
-    })
-
-    deleteBtn.addEventListener('click', () => {
-      onDelete(goods.id)
-    })
+    editBtn.addEventListener('click', () => onEdit(goods))
+    deleteBtn.addEventListener('click', () => onDelete(goods.id))
 
     actionTd.append(editBtn, deleteBtn)
     row.appendChild(actionTd)

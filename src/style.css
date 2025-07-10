@@ -145,6 +145,12 @@ header {
   max-width: 250px;
 }
 
+.table__empty-cell {
+  padding: 1em;
+  text-align: center;
+  opacity: 0.7;
+}
+
 .edit {
   background-color: yellow;
 }
