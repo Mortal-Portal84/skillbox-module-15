@@ -1,7 +1,8 @@
 import { renderForm, renderHeader, renderTable } from './components/components.ts'
+import { handleDelete, rerenderRows } from './utils/tableControllers.ts'
+
 import { getGoodsList } from './api/mockData.ts'
 import type { Goods } from './models/models.ts'
-import { handleDelete, rerenderRows } from './utils/tableControllers.ts'
 
 import './style.css'
 

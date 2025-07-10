@@ -38,7 +38,8 @@ export const renderForm = () => {
 export const renderTableRow = (
   tableBody: HTMLTableSectionElement,
   goodsArray: Goods[],
-  onDelete: (id: string) => void
+  onDelete: (id: string) => void,
+  onEdit: (id: string) => void
 ) => {
   tableBody.replaceChildren()
 
@@ -55,13 +56,20 @@ export const renderTableRow = (
     })
 
     const actionTd = document.createElement('td')
+    actionTd.className = 'table_actionTd'
+
+    const editBtn = createButton('button', 'edit', 'Изменить')
     const deleteBtn = createButton('button', 'delete', 'Удалить')
+
+    editBtn.addEventListener('click', () => {
+      onEdit(goods.id)
+    })
 
     deleteBtn.addEventListener('click', () => {
       onDelete(goods.id)
     })
 
-    actionTd.appendChild(deleteBtn)
+    actionTd.append(editBtn, deleteBtn)
     row.appendChild(actionTd)
 
     tableBody.appendChild(row)

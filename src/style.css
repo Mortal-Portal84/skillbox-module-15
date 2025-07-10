@@ -94,6 +94,18 @@ tbody td {
   border: none;
 }
 
+tbody td:first-child {
+  min-width: 30%;
+}
+
+tbody td:nth-child(2) {
+  min-width: 15%;
+}
+
+tbody td:nth-child(3) {
+  min-width: 10%;
+}
+
 tbody tr {
   border-bottom: solid 1px grey;
 }
@@ -127,6 +139,15 @@ tbody tr {
   background-color: #1a1a1a;
 }
 
+.table_actionTd {
+  display: flex;
+  max-width: 250px;
+}
+
+.edit {
+  background-color: yellow;
+}
+
 .add {
   color: white;
   background-color: #008077;
@@ -141,6 +162,7 @@ tbody tr {
 }
 
 .delete {
+  margin-left: 1em;
   width: 100%;
   color: white;
   background-color: #9d0019;
