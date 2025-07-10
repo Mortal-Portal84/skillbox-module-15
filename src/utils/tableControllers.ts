@@ -3,6 +3,7 @@ import { sortCompare } from './helpers'
 import { renderTableRow } from '../components/table.ts'
 import { saveGoodsToStorage } from './localStorageUtils.ts'
 import type renderForm from '../components/form.ts'
+import { showLoader } from './showLoader.ts'
 
 export type SortState = {
   key: keyof Goods | null
@@ -122,7 +123,9 @@ export const submitForm = (
     saveGoodsToStorage(updatedList)
 
     formElement.reset()
-    placement.replaceChildren(...elements)
-    rerender()
+    showLoader(placement, () => {
+      placement.replaceChildren(...elements)
+      rerender()
+    })
   })
 }

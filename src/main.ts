@@ -4,11 +4,11 @@ import renderTable from './components/table.ts'
 
 import { handleDelete, handleEdit, rerenderRows } from './utils/tableControllers.ts'
 import { getGoodsFromStorage } from './utils/localStorageUtils.ts'
+import { showLoader } from './utils/showLoader.ts'
 
 import type { Goods } from './models/models.ts'
 
 import './style.css'
-import renderLoader from './components/preloader.ts'
 
 let goodsList: Goods[] = getGoodsFromStorage()
 let filteredList: Goods[] = [...goodsList]
@@ -25,7 +25,6 @@ const header = renderHeader()
 const table = renderTable()
 const tbody = table.querySelector('tbody')!
 const thElements = table.querySelectorAll('th.sortable')
-const preloader = renderLoader()
 
 const rerender = () => {
   rerenderRows(
@@ -42,6 +41,7 @@ const rerender = () => {
         rerender
       ),
     (goods: Goods) =>
+      showLoader(app, () => {
       handleEdit(
         goods,
         () => goodsList,
@@ -56,20 +56,14 @@ const rerender = () => {
         header,
         table
       )
+      })
   )
 }
 
-app.append(header, table)
-rerender()
-
-if (!tbody.hasChildNodes()) {
-  const emptyTableRow = document.createElement('tr')
-  const tableCap = document.createElement('td')
-  tableCap.textContent = 'Склад пуст'
-
-  emptyTableRow.appendChild(tableCap)
-  tbody.appendChild(emptyTableRow)
-}
+showLoader(app, () => {
+  app.append(header, table)
+  rerender()
+})
 
 thElements.forEach((th) => {
   th.addEventListener('click', () => {
@@ -93,18 +87,21 @@ searchInput.addEventListener('input', () => {
 
 const addButton = header.querySelector('.add')
 addButton?.addEventListener('click', () => {
-  handleEdit(
-    null,
-    () => goodsList,
-    () => filteredList,
-    (list) => (goodsList = list),
-    (list) => (filteredList = list),
-    () => selectedGoods,
-    (value) => { selectedGoods = value },
-    renderForm,
-    app,
-    rerender,
-    header,
-    table
-  )
+  showLoader(app, () => {
+    handleEdit(
+      null,
+      () => goodsList,
+      () => filteredList,
+      (list) => (goodsList = list),
+      (list) => (filteredList = list),
+      () => selectedGoods,
+      (value) => { selectedGoods = value },
+      renderForm,
+      app,
+      rerender,
+      header,
+      table
+    )
+  })
 })
+

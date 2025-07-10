@@ -198,8 +198,10 @@ header {
 }
 
 .preloader {
+  position: absolute;
+  left: calc(50% - 80px);
+  top: calc(50% - 80px);
   display: inline-block;
-  position: relative;
   width: 80px;
   height: 80px;
 }
