@@ -2,8 +2,9 @@ import type { Goods } from '../models/models.ts'
 
 export const validateTypedText = (e: Event) => {
   const target = e.target as HTMLInputElement
-  target.value = target.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9_.-]/g, '')
-}
+  target.value = target.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9\s.,'!?-]/g, '')
+};
+
 
 export const sortCompare = (
   a: Goods,

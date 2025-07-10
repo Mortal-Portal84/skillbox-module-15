@@ -148,6 +148,14 @@ tbody tr {
   background-color: yellow;
 }
 
+.edit:hover {
+  background-color: #fafa20;
+}
+
+.edit:active {
+  background-color: #a2a206;
+}
+
 .add {
   color: white;
   background-color: #008077;

@@ -1,45 +1,11 @@
-import { createButton, createInput, createTitle } from './ui-elements.ts'
-import { validateTypedText } from '../utils/helpers.ts'
+import { createButton } from './ui-elements.ts'
 import type { Goods } from '../models/models.ts'
-
-export const renderHeader = () => {
-  const wrapper = document.createElement('div')
-  const title = createTitle('h2', 'Склад')
-  const addButton = createButton('submit', 'add', 'Добавить запись')
-  const searchInput = createInput('text', 'search', 'Поиск вещи по названию')
-
-  wrapper.className = 'header__wrapper'
-  searchInput.className = 'form__input'
-
-  wrapper.append(title, searchInput, addButton)
-
-  return wrapper
-}
-
-export const renderForm = () => {
-  const form: HTMLFormElement = document.createElement('form')
-  const title = createTitle('h2', 'Добавить запись')
-  const goodsName = createInput('text', 'goods-name', 'Название', true)
-  const rackName = createInput('text', 'rack', 'Полка', true)
-  const goodsWeight = createInput('number', 'weight', 'Вес', true)
-  const storageDate = createInput('date', 'storage-time', 'Время хранения', true)
-  const submitButton = createButton('submit', 'add', 'Добавить запись')
-
-  form.className = 'form'
-
-  goodsName?.addEventListener('input', (e) => validateTypedText(e))
-  rackName?.addEventListener('input', (e) => validateTypedText(e))
-
-  form.append(title, goodsName, rackName, goodsWeight, storageDate, submitButton)
-
-  return form
-}
 
 export const renderTableRow = (
   tableBody: HTMLTableSectionElement,
   goodsArray: Goods[],
   onDelete: (id: string) => void,
-  onEdit: (id: string) => void
+  onEdit: (goods: Goods) => void
 ) => {
   tableBody.replaceChildren()
 
@@ -62,7 +28,7 @@ export const renderTableRow = (
     const deleteBtn = createButton('button', 'delete', 'Удалить')
 
     editBtn.addEventListener('click', () => {
-      onEdit(goods.id)
+      onEdit(goods)
     })
 
     deleteBtn.addEventListener('click', () => {
@@ -76,7 +42,7 @@ export const renderTableRow = (
   })
 }
 
-export const renderTable = (): HTMLTableElement => {
+const renderTable = (): HTMLTableElement => {
   const table = document.createElement('table')
   table.className = 'table'
 
@@ -108,3 +74,5 @@ export const renderTable = (): HTMLTableElement => {
 
   return table
 }
+
+export default renderTable
