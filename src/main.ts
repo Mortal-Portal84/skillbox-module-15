@@ -8,6 +8,7 @@ import { getGoodsFromStorage } from './utils/localStorageUtils.ts'
 import type { Goods } from './models/models.ts'
 
 import './style.css'
+import renderLoader from './components/preloader.ts'
 
 let goodsList: Goods[] = getGoodsFromStorage()
 let filteredList: Goods[] = [...goodsList]
@@ -24,6 +25,7 @@ const header = renderHeader()
 const table = renderTable()
 const tbody = table.querySelector('tbody')!
 const thElements = table.querySelectorAll('th.sortable')
+const preloader = renderLoader()
 
 const rerender = () => {
   rerenderRows(
