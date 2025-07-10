@@ -1,6 +1,8 @@
 import type { Goods } from '../models/models'
 import { sortCompare } from './helpers'
 import { renderTableRow } from '../components/table.ts'
+import { saveGoodsToStorage } from './localStorageUtils.ts'
+import type renderForm from '../components/form.ts'
 
 export type SortState = {
   key: keyof Goods | null
@@ -31,8 +33,8 @@ export const handleDelete = (
   id: string,
   getGoodsList: () => Goods[],
   getFilteredList: () => Goods[],
-  setGoodsList: UpdateListFn,
-  setFilteredList: UpdateListFn,
+  setGoodsList: (list: Goods[]) => void,
+  setFilteredList: (list: Goods[]) => void,
   rerender: () => void
 ) => {
   const newGoodsList = getGoodsList().filter(item => item.id !== id)
@@ -40,56 +42,87 @@ export const handleDelete = (
 
   setGoodsList(newGoodsList)
   setFilteredList(newFilteredList)
+  saveGoodsToStorage(newGoodsList)
   rerender()
 }
 
 export const handleEdit = (
-  goodsToEdit: Goods | null,
-  getGoodsList: GetterListFn,
-  _getFilteredList: GetterListFn,
-  setGoodsList: UpdateListFn,
-  setFilteredList: UpdateListFn,
-  _getSelectedGoods: GetterGoodsFn,
-  setSelectedGoods: SetterGoodsFn,
-  renderForm: (goods: Goods | null) => HTMLFormElement,
-  root: HTMLElement,
+  goods: Goods | null,
+  getGoodsList: () => Goods[],
+  getFilteredList: () => Goods[],
+  setGoodsList: (list: Goods[]) => void,
+  setFilteredList: (list: Goods[]) => void,
+  getSelected: () => Goods | null,
+  setSelected: (value: Goods | null) => void,
+  renderFormFn: typeof renderForm,
+  container: HTMLElement,
   rerender: () => void,
-  ...persistentElements: HTMLElement[]
+  ...elementsToRestore: HTMLElement[]
 ) => {
-  setSelectedGoods(goodsToEdit)
-  const form = renderForm(goodsToEdit)
+  setSelected(goods)
 
-  const submitButton = form.querySelector('.add')!
-  submitButton.addEventListener('click', (e) => {
+  const form = renderFormFn(goods)
+  submitForm(
+    form,
+    getGoodsList,
+    getFilteredList,
+    setGoodsList,
+    setFilteredList,
+    getSelected,
+    () => setSelected(null),
+    container,
+    rerender,
+    ...elementsToRestore
+  )
+
+  container.replaceChildren(form)
+}
+
+export const submitForm = (
+  formElement: HTMLFormElement,
+  getGoodsList: () => Goods[],
+  _getFilteredList: () => Goods[],
+  setGoodsList: (list: Goods[]) => void,
+  setFilteredList: (list: Goods[]) => void,
+  getSelectedGoods: () => Goods | null,
+  resetSelectedGoods: () => void,
+  placement: HTMLElement,
+  rerender: () => void,
+  ...elements: HTMLElement[]
+) => {
+  const submitButton = formElement.querySelector('.add')
+  submitButton?.addEventListener('click', (e) => {
     e.preventDefault()
-
-    if (!form.checkValidity()) return form.reportValidity()
+    if (!formElement.checkValidity()) return formElement.reportValidity()
 
     const goods: Goods = {
-      id: goodsToEdit ? goodsToEdit.id : crypto.randomUUID(),
+      id: crypto.randomUUID(),
       goodsName: (document.getElementById('goods-name') as HTMLInputElement).value.trim(),
       goodsRack: (document.getElementById('rack') as HTMLInputElement).value,
       goodsWeight: (document.getElementById('weight') as HTMLInputElement).value,
       storageTime: (document.getElementById('storage-time') as HTMLInputElement).value
     }
 
+    const currentList = getGoodsList()
+    const selectedGoods = getSelectedGoods()
+
     let updatedList: Goods[]
-    if (goodsToEdit) {
-      updatedList = getGoodsList().map(item =>
-        item.id === goodsToEdit.id ? goods : item
+
+    if (selectedGoods) {
+      updatedList = currentList.map((item) =>
+        item.id === selectedGoods.id ? { ...item, ...goods, id: item.id } : item
       )
+      resetSelectedGoods()
     } else {
-      updatedList = [goods, ...getGoodsList()]
+      updatedList = [goods, ...currentList]
     }
 
     setGoodsList(updatedList)
-    setFilteredList(updatedList)
-    setSelectedGoods(null)
+    setFilteredList([...updatedList])
+    saveGoodsToStorage(updatedList)
 
-    form.reset()
-    root.replaceChildren(...persistentElements)
+    formElement.reset()
+    placement.replaceChildren(...elements)
     rerender()
   })
-
-  root.replaceChildren(form)
 }

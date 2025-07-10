@@ -3,15 +3,17 @@ import renderForm from './components/form.ts'
 import renderTable from './components/table.ts'
 
 import { handleDelete, handleEdit, rerenderRows } from './utils/tableControllers.ts'
+import { getGoodsFromStorage } from './utils/localStorageUtils.ts'
 
-import getGoodsList from './api/mockData.ts'
 import type { Goods } from './models/models.ts'
 
 import './style.css'
 
-let goodsList: Goods[] = getGoodsList()
+let goodsList: Goods[] = getGoodsFromStorage()
 let filteredList: Goods[] = [...goodsList]
+
 let selectedGoods: Goods | null = null
+
 let sortState: { key: keyof Goods | null; order: 'ascending' | 'descending' } = {
   key: null,
   order: 'ascending'
@@ -33,8 +35,8 @@ const rerender = () => {
         id,
         () => goodsList,
         () => filteredList,
-        (list) => (goodsList = list),
-        (list) => (filteredList = list),
+        (newList) => goodsList = newList,
+        (newList) => filteredList = newList,
         rerender
       ),
     (goods: Goods) =>
@@ -42,8 +44,8 @@ const rerender = () => {
         goods,
         () => goodsList,
         () => filteredList,
-        (list) => (goodsList = list),
-        (list) => (filteredList = list),
+        (list) => goodsList = list,
+        (list) => filteredList = list,
         () => selectedGoods,
         (value) => { selectedGoods = value },
         renderForm,
@@ -57,6 +59,19 @@ const rerender = () => {
 
 app.append(header, table)
 rerender()
+
+thElements.forEach((th) => {
+  th.addEventListener('click', () => {
+    const key = th.id as keyof Goods
+    const isSameKey = sortState.key === key
+    const newOrder =
+      isSameKey && sortState.order === 'ascending' ? 'descending' : 'ascending'
+
+    sortState = { key, order: newOrder }
+
+    rerender()
+  })
+})
 
 const searchInput = header.querySelector('#search') as HTMLInputElement
 searchInput.addEventListener('input', () => {
@@ -83,15 +98,4 @@ addButton?.addEventListener('click', () => {
     header,
     table
   )
-})
-
-thElements.forEach((th) => {
-  th.addEventListener('click', () => {
-    const key = th.id as keyof Goods
-    const isSameKey = sortState.key === key
-    const newOrder =
-      isSameKey && sortState.order === 'ascending' ? 'descending' : 'ascending'
-    sortState = { key, order: newOrder }
-    rerender()
-  })
 })

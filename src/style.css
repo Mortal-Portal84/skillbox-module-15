@@ -81,7 +81,7 @@ table, th, td {
 }
 
 th, td {
-  padding: 10px;
+  padding: 0.6em 1em;
   text-align: left;
   border-left: none;
   border-right: none;
@@ -110,10 +110,11 @@ tbody tr {
   border-bottom: solid 1px grey;
 }
 
-.header__wrapper {
+header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 1em;
 }
 
 .table {
