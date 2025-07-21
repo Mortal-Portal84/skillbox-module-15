@@ -74,6 +74,10 @@ table {
   border-collapse: collapse;
 }
 
+table th:first-child {
+  min-width: 40%;
+}
+
 table, th, td {
   font-weight: normal;
   color: white;
@@ -92,18 +96,6 @@ tbody td {
   color: black;
   background-color: white;
   border: none;
-}
-
-tbody td:first-child {
-  min-width: 30%;
-}
-
-tbody td:nth-child(2) {
-  min-width: 15%;
-}
-
-tbody td:nth-child(3) {
-  min-width: 10%;
 }
 
 tbody tr {
@@ -142,7 +134,6 @@ header {
 
 .table_actionTd {
   display: flex;
-  max-width: 250px;
 }
 
 .table__empty-cell {
